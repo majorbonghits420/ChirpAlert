@@ -17,6 +17,8 @@ function [] = chirpAlert()
 
 % Buffer update
 
+% Apply filter
+
 % Detection
 
 % Interpret results
@@ -40,6 +42,14 @@ function [] = setupAudio()
 
 end
 
+% setupFilter()
+% Inputs:
+% Outputs:
+% Description
+function [] = setupFilter()
+
+end
+
 % setupML()
 % Inputs:
 % Outputs:
@@ -53,6 +63,15 @@ end
 % Outputs:
 % Description:
 function [] = updateBuffer()
+
+end
+
+
+% applyFilter()
+% Inputs:
+% Outputs:
+% Description
+function [] = applyFilter()
 
 end
 
