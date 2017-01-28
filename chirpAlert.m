@@ -37,7 +37,6 @@ end
 function [] = setupGlobalVars()
   setGlobalParams();
   % Create a buffer for the audio
-  global audioBuffer;
   global BUFFER_SIZE;
   audioBuffer = zeros(1,BUFFER_SIZE);
   % Counter for number of chirps
