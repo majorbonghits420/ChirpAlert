@@ -120,7 +120,6 @@ function [] = updateBuffer()
   numSampled = numSampled + 1;
 end
 
-
 % applyFilter()
 % Inputs:
 % Outputs:
