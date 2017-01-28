@@ -52,6 +52,10 @@ function [] = setGlobalParams()
   global BUFFER_SIZE = floor(SAMPLE_RATE / BUFFER_TIME);
   % Filename to get audio from
   global FILE_NAME = "";
+  % Lowest frequency of bandpass filter
+  global FILTER_LOW = 1000; % Lowest possible freq by bird
+  % Highest frequency of bandpass filter
+  global FILTER_HIGH = 8000; % Highest possible freq by bird
 end
 
 % setupAudio()
