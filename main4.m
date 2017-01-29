@@ -376,26 +376,37 @@ objChirp = gmdistribution.fit(X,8,'CovType',...
 % %  Test data
 
  %test_data=cepstraTwit';
- %test_data=cepstraTweet';
+ test_data=cepstraTweet';
 %  test_data=cepstraClick';
-  test_data=cepstraChit';
+ % test_data=cepstraChit';
 % test_data=cepstraChirp';
 
 % % Word recognition
 
-[~,nlogl1] = posterior(objTwit,test_data);
+[~,nloglTwit] = posterior(objTwit,test_data);
 
-[~,nlogl2] = posterior(objTweet,test_data);
+[~,nloglTweet] = posterior(objTweet,test_data);
 
-[~,nlogl3] = posterior(objClick,test_data);
+[~,nloglClick] = posterior(objClick,test_data);
 
-[~,nlogl4] = posterior(objChit,test_data);
+[~,nloglChit] = posterior(objChit,test_data);
 
-[~,nlogl5] = posterior(objChirp,test_data);
+[~,nloglChirp] = posterior(objChirp,test_data);
 
-log_like=[nlogl1 nlogl2 nlogl3 nlogl4 nlogl5];
+log_like=[nloglTwit nloglTweet nloglClick nloglChit nloglChirp];
 
-[~,Spoken_word]=min(log_like)
+[~,Spoken_word]=min(log_like);
+
+words = {' twit' ' tweet' ' click' ' chit' ' chirp'};
+
+soundChoice = words(Spoken_word);
+
+if (Spoken_word < 6)
+    disp(strcat('Sound made:',soundChoice,' - happy sound!'));
+else
+    disp(strcat('Sound made:',soundChoice,' - possibly unhealthy bird, consult a veterinarian'));
+end
+
 
 
 
