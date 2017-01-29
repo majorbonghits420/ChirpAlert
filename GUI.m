@@ -124,11 +124,9 @@ index_selected = get(handles.Files,'Value');
 list = get(handles.Files,'String');
 item_selected = list{index_selected};
 
-% Run Optical Flow
 set(handles.Instructions, 'String', 'Processing Video')
 fprintf('Currently Processing Video...\n')
-[u,v,flow,vid] = GenerateFlow(item_selected,3,.05);
-[height, width, color, frames] = size(vid);
+
 fprintf('Done Processing\n')
 
 % Set image axes
@@ -141,98 +139,12 @@ axes(handles.FlowAxes);
 imshow(flow(:,:,1));
 set(handles.FlowAxesLabel,'String', 'Optical Flow of Frame 1')
 
-% Instructions to select object
-set(handles.Instructions, 'String', 'Select Object')
-fprintf('Please Select Object to be Tracked\n')
-
-% Grab object
-axes(handles.VideoAxes);
-rect = getrect;     % XMIN, YMIN, WIDTH, HEIGHT
-
-% Construct object Image
-obj = vid(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:,1);
-objg = rgb2gray(obj);
-
-% Search for object in frame 1
-frame1 = vid(:,:,:,1);
-frame1g = rgb2gray(frame1);
 set(handles.Instructions, 'String', 'Matching Object in Frame 1')
-[ycenter,xcenter, C] = CorrelationSearch(frame1g, objg);
-RectPlot(frame1g,objg,xcenter, ycenter, handles.FlowAxes);
 
 fprintf('Object Selected, Press A Button to view Tracking and Flow\n')
 set(handles.FlowAxesLabel,'String', 'Found Original Object')
-pause;
 
-
-
-
-% attempts to find object in first frame
-searchSpace = rgb2gray(vid(:,:,:,1));
-objGray = rgb2gray(obj);
-[objx, objy] = size(objGray);
-[y_cent, x_cent, C] = CorrelationSearch(searchSpace, objGray);
-% Z is the observations of the object we are tracking
-Z = zeros(4,frames); % Preallocate space
-Z(:,1) = [x_cent, y_cent, 0, 0]; % our first observation
-% Set searchspace for start of loop
-searchSpace = rgb2gray(vid(:,:,:,2));
-u_prev = 0;
-v_prev = 0;
-% now process the whole video
-delay = 1; % How many frames to skip between processing
-[y_cent, x_cent, C] = CorrelationSearch(searchSpace, objGray);
 figure('Name','Tracking','Color', [255 255 255])
-hold on
-for i = 1:frames-3
-    tic
-    fprintf('processing frame %d \n', i);
-    currentFrame = vid(:,:,:,i);
-    nextFrame = vid(:,:,:,i+delay);
-    % update position for frame i+1
-    Z(:,i+delay) = [x_cent, y_cent, 0, 0];
-    % current observation of velocity
-    Z(3:4,i) = [x_cent-Z(1,i), y_cent-Z(2,i)];
-
-    %[u_prev,v_prev] = ImFlow(currentFrame, nextFrame, u_prev,v_prev, 10);
-
-    xPredict = kalmanPrediction(Z,frames);
-    
-    % TODO graph xPredict on photo, Nathan how to connect it with GUI?
-    
-    % Don't need to do the frame-1 case because it was taken care of
-    % earlier in this loop
-    if (i <frames-2 && i >1)
-        % Want prediction of frame j, look at xPredict(j)
-        % Possible place to put optical flow for predicting where the
-        % object will be
-        % Possible use the predicted velocity to tell what direction the
-        % object is going in, and then use the optical flow as the velocity
-        % estimate since that seems to be directionless(?) when calling
-        % ImFlow
-        xRange = max(round(xPredict(1,i+2*delay)-1.5*objy),1):min(round(xPredict(1,i+2*delay)+1.5*objy), width );
-        yRange = max(round(xPredict(2,i+2*delay)-1.5*objx),1):min(round(xPredict(2,i+2*delay)+1.5*objx), height);
-        searchSpace = rgb2gray(vid(yRange,xRange,:,i+2*delay));
-        if(xPredict(3,i+1) < 5*max(Z(3,:)) && xPredict(4,i+1) < 5*max(Z(4,:)))
-          [y_c, x_c, C] = CorrelationSearch(searchSpace, objGray);
-          disp('Kalman attempt - Kalman returned reasonable value');
-            if ( max(C(:)) > .5)
-              y_cent = yRange(max(min(round(y_c),height),1));
-              x_cent = xRange(max(min(round(x_c),width),1));
-              disp('Kalman Strong - Strong correlation between object and search space');
-            end
-        else           
-          [y_cent, x_cent, C] = CorrelationSearch(rgb2gray(nextFrame), objGray);          
-        end
-        RectPlot(rgb2gray(nextFrame),objGray,x_cent, y_cent, axes);
-        
-    end
-    toc
-    pause(0.05)
-    clf
-end
-
-hold off
 fprintf('Video is over, GUI will close after button presss\n')
 pause
 
