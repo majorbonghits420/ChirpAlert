@@ -87,7 +87,9 @@ end
 % Outputs:
 % Description
 function [] = setupFilter()
-
+  % Initialize the buffer
+  global bandpassFilter = zeros(1, BUFFER_SIZE);
+  % Fill out bandpass filter
 end
 
 % setupML()
