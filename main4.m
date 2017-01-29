@@ -518,6 +518,65 @@ for i = 1:43
     all_data_Squeak=[all_data_Squeak cepstraSqueak];
 end
 
+% Dog Bark
+filename='dog_bark_x.wav';
+y3dog=audioread(filename);
+y2dog=y3dog(:,1);
+if length(y2dog) < 16000
+    numZeros = 16000-length(y2dog);
+    y1dog=[y2dog; zeros(numZeros,1)];
+else
+    y1dog = y2dog(1:16000);
+end
+length_all_sig_dog=[length(y1dog)];
+max_length_dog=max(length_all_sig_dog);
+
+if length(y1dog)==max_length_dog
+        [cepstraDog,aspectrum,pspectrumDog] = melfcc(y1dog,Fs,'wintime',0.025,'hoptime',0.010);
+    else
+        y1dog=[y1dog' zeros(1,max_length-length(y1dog))];
+        [cepstraDog,aspectrumDog,pspectrumDog] = melfcc(y1dog,Fs,'wintime',0.025,'hoptime',0.010);           
+end  
+
+% Cat meow
+filename='cat_big_x.wav';
+y3cat=audioread(filename);
+y2cat=y3cat(:,1);
+if length(y2cat) < 16000
+    numZeros = 16000-length(y2cat);
+    y1cat=[y2cat; zeros(numZeros,1)];
+else
+    y1cat = y2cat(1:16000);
+end
+length_all_sig_cat=[length(y1cat)];
+max_length_cat=max(length_all_sig_cat);
+
+if length(y1cat)==max_length_cat
+        [cepstraCat,aspectrumCat,pspectrumCat] = melfcc(y1cat,Fs,'wintime',0.025,'hoptime',0.010);
+    else
+        y1dog=[y1dog' zeros(1,max_length-length(y1dog))];
+        [cepstraCat,aspectrumCat,pspectrumCat] = melfcc(y1cat,Fs,'wintime',0.025,'hoptime',0.010);           
+end
+    
+% Door shut
+filename='close_door.wav';
+y3door=audioread(filename);
+y2door=y3door(:,1);
+if length(y2door) < 16000
+    numZeros = 16000-length(y2door);
+    y1door=[y2door; zeros(numZeros,1)];
+else
+    y1door = y2door(1:16000);
+end
+length_all_sig_door=[length(y1door)];
+max_length_door=max(length_all_sig_door);
+
+if length(y1door)==max_length_door
+        [cepstraDoor,aspectrumDoor,pspectrumDoor] = melfcc(y1door,Fs,'wintime',0.025,'hoptime',0.010);
+    else
+        y1door=[y1door' zeros(1,max_length-length(y1door))];
+        [cepstraDoor,aspectrumDoor,pspectrumDoor] = melfcc(y1door,Fs,'wintime',0.025,'hoptime',0.010);           
+    end
 
 % % Building model
 
@@ -562,16 +621,22 @@ X=[all_data_Squeak'];
 objSqueak = gmdistribution.fit(X,8,'CovType',...
     'diagonal','SharedCov',true,'Options',options);
 
+
+
+
 % %  Test data
 
  %test_data=cepstraTwit';
  %test_data=cepstraTweet';
- test_data=cepstraClick';
+ %test_data=cepstraClick';
  % test_data=cepstraChit';
 % test_data=cepstraChirp';
-% test_data=cepstraCough';
-% test_data=cepstraSneeze';
-% test_data=cepstraSqueak';
+ %test_data=cepstraCough';
+ test_data=cepstraSneeze';
+ %test_data=cepstraSqueak';
+ %test_data=cepstraDog';
+ %test_data=cepstraCat';
+ %test_data=cepstraDoor';
 
 % % Word recognition
 
@@ -593,6 +658,7 @@ objSqueak = gmdistribution.fit(X,8,'CovType',...
 
 log_like=[nloglTwit nloglTweet nloglClick nloglChit nloglChirp...
     nloglCough nloglSneeze nloglSqueak];
+disp(log_like);
 
 [~,Spoken_word]=min(log_like);
 
@@ -601,10 +667,12 @@ words = {' twit' ' tweet' ' click' ' chit' ' chirp' 'cough'...
 
 soundChoice = words(Spoken_word);
 
+if min(log_like)>6500
+    disp('Unknown noise: let us know'); %change!
 if (Spoken_word < 6)
     disp(strcat('Sound made: ',soundChoice,' - happy sound!'));
 else
-    disp(strcat('Sound made: ',soundChoice,' - possibly unhealthy bird, consult a veterinarian'));
+    disp(strcat('Sound made: ',{' '},soundChoice,' - possibly unhealthy bird, consult a veterinarian'));
 end
 
 
